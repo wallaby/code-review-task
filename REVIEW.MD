@@ -2,6 +2,7 @@
 
 *Also available [here](https://github.com/wallaby/code-review-task/pull/1/files) if we manage to share github accounts.*
 
+- [] Structure of the project is flat, it would be nice to have packages to organise files
 - [] TasksListAdapter.kt line 33: This might be of personal preference, but I prefer one return point, and this could be converted to a when expression like so:
 ```kotlin
 return when (type) {
