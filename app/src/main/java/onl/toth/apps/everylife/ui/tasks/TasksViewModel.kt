@@ -1,22 +1,34 @@
 package onl.toth.apps.everylife.ui.tasks
 
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import onl.toth.apps.everylife.network.model.Task
+import onl.toth.apps.everylife.network.model.TaskType
 import onl.toth.apps.everylife.repository.TaskRepository
 import javax.inject.Inject
 
 class TasksViewModel @Inject constructor(private var taskRepository: TaskRepository) : ViewModel() {
 
-    private var tasks: MutableLiveData<Array<Task>> = MutableLiveData(emptyArray())
-    val filteredTasks: MutableLiveData<Array<Task>> = MutableLiveData(emptyArray())
+    private val tasks: MutableLiveData<List<Task>> = MutableLiveData(emptyList())
+    private val filters: MutableLiveData<List<TaskType>> = MutableLiveData(TaskType.values().toList())
+    val filteredTasks: MediatorLiveData<List<Task>> = MediatorLiveData()
 
     val loadingState = MutableLiveData<TaskLoadingState>()
 
+    init {
+        filteredTasks.addSource(tasks) { updateFilteredTasks() }
+        filteredTasks.addSource(filters) { updateFilteredTasks() }
+    }
+
+    private fun updateFilteredTasks() {
+        filteredTasks.value =
+            tasks.value?.filter { filters.value?.contains(it.type) ?: false } ?: emptyList()
+    }
 
     fun onFragmentReady() {
         fetchTasks()
@@ -27,7 +39,7 @@ class TasksViewModel @Inject constructor(private var taskRepository: TaskReposit
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val  tasksFromServer = taskRepository.fetchTasks()
-                tasks.postValue(tasksFromServer)
+                tasks.postValue(tasksFromServer?.toList() ?: emptyList())
                 loadingState.postValue(TaskLoadingState.LOADED)
             } catch (e: Exception) {
                 loadingState.postValue(TaskLoadingState.ERROR)
@@ -35,20 +47,7 @@ class TasksViewModel @Inject constructor(private var taskRepository: TaskReposit
         }
     }
 
-    fun filterClicked(tag: Any?) {
-////        TODO("B: implement this so that the list will show only the tasks that have the selected TaskType")
-//        if (filteredTasks?.get(0)?.type?.equals(tag as TaskType)!!) {
-//            filteredTasks = tasks
-//        } else {
-//            val list =
-//                tasks?.filter {
-//                    val taskType = tag as TaskType
-//                    it.type.equals(taskType)
-//                }
-//            filteredTasks = list?.toTypedArray()
-//        }
-//        val adapter: TasksListAdapter = fragment?.recyclerView?.adapter as TasksListAdapter
-//        adapter.updateFilter(this!!.filteredTasks!!)
-//        fragment?.recyclerView?.adapter?.notifyDataSetChanged()
+    fun updateFilters(filters: List<TaskType>) {
+        this.filters.value = filters
     }
 }

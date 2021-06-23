@@ -5,4 +5,6 @@
     <color name="colorAccent">#D81B60</color>
     <color name="accentedTextColor">@android:color/black</color>
     <color name="textColor">#444444</color>
+    <color name="warningColor">#880000</color>
+    <color name="dividerColor">#777777</color>
 </resources>

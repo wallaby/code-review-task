@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import onl.toth.apps.everylife.TaskListApp.Companion.application
-import onl.toth.apps.everylife.network.model.Task
 import onl.toth.apps.everylife.network.model.TaskType
 import onl.toth.apps.everylife.databinding.TaskListFragmentBinding
 import onl.toth.apps.everylife.tools.connectivity.ConnectivityLiveData
@@ -21,7 +21,6 @@ class TaskListFragment : Fragment() {
     lateinit var viewModel: TasksViewModel
 
     private lateinit var connectivityLiveData: ConnectivityLiveData
-
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -49,24 +48,27 @@ class TaskListFragment : Fragment() {
 
         val rootView = binding.root
 
+        setupFilters()
 
-        binding.filterGeneral.setOnClickListener {
-            viewModel.filterClicked(TaskType.general)
-        }
-
-        binding.filterMedication.setOnClickListener {
-            viewModel.filterClicked(TaskType.medication)
-        }
-
-        binding.filterHydration.setOnClickListener {
-            viewModel.filterClicked(TaskType.hydration)
-        }
-
-        binding.filterNutrition.setOnClickListener {
-            viewModel.filterClicked(TaskType.nutrition)
-        }
-        setupTaskListView(binding.taskList, emptyArray())
+        setupTaskListView(binding.taskList)
         return rootView
+    }
+
+    private fun setupFilters() {
+        binding.filterGeneral.setOnClickListener(this::filterClicked)
+        binding.filterMedication.setOnClickListener(this::filterClicked)
+        binding.filterHydration.setOnClickListener(this::filterClicked)
+        binding.filterNutrition.setOnClickListener(this::filterClicked)
+    }
+
+    private fun filterClicked(it: View) {
+        val filters = mutableListOf<TaskType>()
+        if (binding.filterGeneral.isChecked) filters.add(TaskType.general)
+        if (binding.filterMedication.isChecked) filters.add(TaskType.medication)
+        if (binding.filterHydration.isChecked) filters.add(TaskType.hydration)
+        if (binding.filterNutrition.isChecked) filters.add(TaskType.nutrition)
+        viewModel.updateFilters(filters)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,7 +79,7 @@ class TaskListFragment : Fragment() {
 
     private fun initialiseObservers() {
         viewModel.filteredTasks.observe(viewLifecycleOwner, {
-            taskListAdapter.updateFilter(it)
+            taskListAdapter.updateTasks(it)
         })
 
         viewModel.loadingState.observe(viewLifecycleOwner, {
@@ -97,15 +99,11 @@ class TaskListFragment : Fragment() {
         connectivityLiveData.observe(viewLifecycleOwner, Observer { isAvailable ->
             when (isAvailable) {
                 true -> {
+                    binding.noNetworkBar.visibility = View.GONE
                     viewModel.onFragmentReady()
-//                    statusButton.visibility = View.GONE
-//                    moviesRecyclerView.visibility = View.VISIBLE
-//                    searchEditText.visibility = View.VISIBLE
                 }
                 false -> {
-//                    statusButton.visibility = View.VISIBLE
-//                    moviesRecyclerView.visibility = View.GONE
-//                    searchEditText.visibility = View.GONE
+                    binding.noNetworkBar.visibility = View.VISIBLE
                 }
             }
         })
@@ -120,18 +118,20 @@ class TaskListFragment : Fragment() {
     }
 
     private fun showList() {
-        binding.progressBar.visibility = View.VISIBLE
+        binding.taskList.visibility = View.VISIBLE
     }
 
     private fun hideList() {
-        binding.progressBar.visibility = View.INVISIBLE
+        binding.taskList.visibility = View.INVISIBLE
     }
 
 
-    private fun setupTaskListView(taskListView: RecyclerView, tasks: Array<Task>) {
-        taskListAdapter = TaskListAdapter(tasks)
+    private fun setupTaskListView(taskListView: RecyclerView) {
+        taskListAdapter = TaskListAdapter()
         taskListView.adapter = taskListAdapter
         taskListView.layoutManager = LinearLayoutManager(context)
+        taskListView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
     }
 
 }
+

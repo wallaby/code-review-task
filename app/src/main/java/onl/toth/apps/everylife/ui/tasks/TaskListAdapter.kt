@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import onl.toth.apps.everylife.R
 import onl.toth.apps.everylife.network.model.Task
 
-class TaskListAdapter(private var tasks: Array<Task>) :
+class TaskListAdapter :
     RecyclerView.Adapter<TaskViewHolder>() {
+
+    private val tasks: MutableList<Task> = mutableListOf()
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): TaskViewHolder {
         val v = LayoutInflater.from(viewGroup.context).inflate(R.layout.task_item, viewGroup, false)
@@ -21,7 +23,9 @@ class TaskListAdapter(private var tasks: Array<Task>) :
         viewHolder.bind(tasks[position])
     }
 
-    fun updateFilter(filteredTasks: Array<Task>) {
-        tasks = filteredTasks
+    fun updateTasks(filteredTasks: List<Task>) {
+        tasks.clear()
+        tasks.addAll(filteredTasks)
+        notifyDataSetChanged()
     }
 }

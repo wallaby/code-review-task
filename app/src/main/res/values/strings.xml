@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Android Application</string>
+    <string name="app_name">Task List Application</string>
+    <string name="task_list_header">Tasks</string>
+    <string name="no_network_warning">You are offline.</string>
 </resources>
