@@ -23,11 +23,12 @@ class TasksViewModel @Inject constructor(private var taskRepository: TaskReposit
     init {
         filteredTasks.addSource(tasks) { updateFilteredTasks() }
         filteredTasks.addSource(filters) { updateFilteredTasks() }
+        updateFilteredTasks()
     }
 
     private fun updateFilteredTasks() {
-        filteredTasks.value =
-            tasks.value?.filter { filters.value?.contains(it.type) ?: false } ?: emptyList()
+        filteredTasks.postValue(
+            tasks.value?.filter { filters.value?.contains(it.type) ?: false } ?: emptyList())
     }
 
     fun onFragmentReady() {
