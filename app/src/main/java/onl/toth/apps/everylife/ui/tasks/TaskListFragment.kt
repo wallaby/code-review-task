@@ -1,6 +1,7 @@
 package onl.toth.apps.everylife.ui.tasks
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,7 @@ import onl.toth.apps.everylife.databinding.TaskListFragmentBinding
 import onl.toth.apps.everylife.tools.connectivity.ConnectivityLiveData
 import javax.inject.Inject
 
-class TaskListFragment : Fragment() {
+class TaskListFragment  : Fragment() {
 
     lateinit var viewModel: TasksViewModel
 
@@ -92,7 +93,11 @@ class TaskListFragment : Fragment() {
                     showList()
                     hideLoadingSpinner()
                 }
-                TaskLoadingState.ERROR, null -> TODO("Handle errors")
+                TaskLoadingState.ERROR, null -> {
+                    Log.d("TaskListFragment", "Couldn't load list of tasks.")
+                    hideLoadingSpinner()
+                    showList()
+                }
             }
         })
 

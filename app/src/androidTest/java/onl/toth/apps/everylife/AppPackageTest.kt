@@ -1,7 +1,7 @@
 package onl.toth.apps.everylife
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,11 +12,11 @@ import org.junit.runner.RunWith
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+class AppPackageTest {
     @Test
-    fun useAppContext() {
+    fun testPackageName() {
         // Context of the app under test.
-        val appContext = InstrumentationRegistry.getTargetContext()
-        Assert.assertEquals("com.elt.application", appContext.packageName)
+        val appContext = ApplicationProvider.getApplicationContext<TaskListApp>()
+        Assert.assertEquals("onl.toth.apps.everylife", appContext.packageName)
     }
 }

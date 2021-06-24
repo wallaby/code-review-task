@@ -42,6 +42,8 @@ class TasksViewModel @Inject constructor(private var taskRepository: TaskReposit
                 tasks.postValue(tasksFromServer?.toList() ?: emptyList())
                 loadingState.postValue(TaskLoadingState.LOADED)
             } catch (e: Exception) {
+                val cachedTasks = taskRepository.getLocalTaskList()
+                tasks.postValue(cachedTasks)
                 loadingState.postValue(TaskLoadingState.ERROR)
             }
         }
